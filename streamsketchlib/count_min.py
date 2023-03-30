@@ -1,5 +1,4 @@
 from math import ceil, inf, pow, log
-import numpy as np
 import mmh3
 
 
@@ -9,12 +8,13 @@ class CountMin:
     def __init__(self, epsilon=0.05, delta=0.05, seed=10):
         self.epsilon = epsilon
         self.delta = delta
-        self.k = ceil(2/self.epsilon)
-        self.t = ceil(log(1/self.delta))
-        self.C = np.zeros((self.t, self.k), dtype=int)
-        self._hash_seeds = [0 for _ in range(self.t)]
+        self.width = ceil(2/self.epsilon)
+        self.depth = ceil(log(1/self.delta))
+        self.table = [[0 for _ in range(self.width)]
+                      for __ in range(self.depth)]
+        self._hash_seeds = [0 for _ in range(self.depth)]
 
-        for i in range(self.t):
+        for i in range(self.depth):
             self._hash_seeds[i] = i*i*seed
 
     @classmethod
@@ -26,9 +26,10 @@ class CountMin:
         new_cm = cls()
         new_cm.epsilon = original_cm.epsilon
         new_cm.delta = original_cm.delta
-        new_cm.k = original_cm.k
-        new_cm.t = original_cm.t
-        new_cm.C = np.zeros((new_cm.t, new_cm.k), dtype=int)
+        new_cm.width = original_cm.width
+        new_cm.t = original_cm.depth
+        new_cm.table = [[0 for _ in range(new_cm.width)]
+                        for __ in range(new_cm.depth)]
         new_cm._hash_seeds = original_cm._hash_seeds
         return new_cm
 
@@ -36,20 +37,25 @@ class CountMin:
         """ Compute the hash of a token. Converts hash value to a bin number
             based on k."""
         hash_value = mmh3.hash(token, seed, signed=False)/self.max_32_int
-        bin_number = hash_value * self.k
+        bin_number = hash_value * self.width
         return int(bin_number)
 
     def insert(self, token, count):
-        for i in range(self.t):
-            col = self._hash(token, self._hash_seeds[i])
-            self.C[i, col] = self.C[i, col] + count
+        for row in range(self.depth):
+            col = self._hash(token, self._hash_seeds[row])
+            self.table[row][col] = self.table[row][col] + count
 
     def estimate_frequency(self, token):
         estimate = inf
-        for i in range(self.t):
-            col = self._hash(token, self._hash_seeds[i])
-            estimate = min(estimate, self.C[i, col])
+        for row in range(self.depth):
+            col = self._hash(token, self._hash_seeds[row])
+            estimate = min(estimate, self.table[row][col])
         return estimate
 
     def merge(self, other_count_min):
-        self.C = np.add(self.C, other_count_min.C)
+        row_count = len(self.table)
+        col_count = len(self.table[0])
+
+        for row in range(row_count):
+            for col in range(col_count):
+                self.table[row][col] += other_count_min.table[row][col]

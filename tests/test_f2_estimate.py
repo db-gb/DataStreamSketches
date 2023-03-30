@@ -38,8 +38,8 @@ def test_f2_merge():
     S2.insert('b', -5)
     S2.insert('a', -10)
 
-    f2_estimate.merge(S2)
-    test = f2.estimator()
+    S1.merge(S2)
+    test = S1.estimator()
 
     assert test >= (1-epsilon)*8326 and test <= (1+epsilon)*8326
 
