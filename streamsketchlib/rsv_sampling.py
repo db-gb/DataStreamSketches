@@ -2,7 +2,7 @@ import random
 
 
 class RsvSampling:
-    """ 
+    """
     Sample a random element in a data stream without knowing the stream length
     """
     def __init__(self, rsv_size):

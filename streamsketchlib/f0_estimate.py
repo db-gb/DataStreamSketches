@@ -6,9 +6,9 @@ import statistics
 
 
 class F0Estimate:
-    """ 
+    """
     Loglog algorithm: memory efficient data structure to estimate
-    the number of distinct elements in streams 
+    the number of distinct elements in streams
     """
     def __init__(self, epsilon=0.01, delta=0.01, c=2, hash_type="mmh3", seed=42):
         """ epsilon: relative error
