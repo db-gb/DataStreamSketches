@@ -1,4 +1,7 @@
+import random
+
 from streamsketchlib.count_min import CountMin
+import pandas as pd
 
 def test_countmin():
     mincounter = CountMin()
@@ -42,3 +45,26 @@ def test_merge():
     assert mincounter1.estimate_frequency('d') >= 15
     assert mincounter1.estimate_frequency('e') >= 17
 
+
+def test_large_file():
+    mincounter = CountMin()
+
+    try:
+        test_data = pd.read_csv('item_sales_filtered.csv')
+        correct_quantities = pd.read_csv('correct_sums.csv')
+    except FileNotFoundError as e:
+        print('Test files not found. Skipping test.')
+        return
+
+    item_sales = test_data.values.tolist()
+    true_sums = correct_quantities.values.tolist()
+    counter = 0
+    for item in item_sales:
+        counter += 1
+        mincounter.insert(str(item[0]), item[1])
+
+    for i in range(10):
+        item, true_sum = random.choice(true_sums)
+        calculated_sum = mincounter.estimate_frequency(str(item))
+
+        assert calculated_sum >= 0.95 * true_sum and calculated_sum <= 1.05 * true_sum
