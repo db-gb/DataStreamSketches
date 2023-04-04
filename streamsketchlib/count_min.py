@@ -5,10 +5,12 @@ import mmh3
 class CountMin:
     max_32_int = pow(2, 32) - 1
 
-    def __init__(self, epsilon=0.05, delta=0.05, seed=10):
+    def __init__(self, phi=0.05, epsilon=0.2, delta=0.05, seed=10):
         self.epsilon = epsilon
+        self.phi = phi
         self.delta = delta
-        self.width = ceil(2/self.epsilon)
+        self.epsilon_star = self.phi * self.epsilon
+        self.width = ceil(2/self.epsilon_star)
         self.depth = ceil(log(1/self.delta))
         self.table = [[0 for _ in range(self.width)]
                       for __ in range(self.depth)]
@@ -45,7 +47,7 @@ class CountMin:
             col = self._hash(token, self._hash_seeds[row])
             self.table[row][col] = self.table[row][col] + count
 
-    def estimate_frequency(self, token):
+    def get_frequency(self, token):
         estimate = inf
         for row in range(self.depth):
             col = self._hash(token, self._hash_seeds[row])
