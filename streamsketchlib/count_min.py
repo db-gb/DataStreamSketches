@@ -10,7 +10,7 @@ class CountMin:
         self.phi = phi
         self.delta = delta
         self.epsilon_star = self.phi * self.epsilon
-        self.width = ceil(2/self.epsilon_star)
+        self.width = ceil(1/self.epsilon_star)
         self.depth = ceil(log(1/self.delta))
         self.table = [[0 for _ in range(self.width)]
                       for __ in range(self.depth)]
@@ -47,7 +47,7 @@ class CountMin:
             col = self._hash(token, self._hash_seeds[row])
             self.table[row][col] = self.table[row][col] + count
 
-    def get_frequency(self, token):
+    def estimate_count(self, token):
         estimate = inf
         for row in range(self.depth):
             col = self._hash(token, self._hash_seeds[row])

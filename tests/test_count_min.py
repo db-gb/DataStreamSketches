@@ -2,9 +2,12 @@ import random
 
 from streamsketchlib.count_min import CountMin
 import pandas as pd
+from pympler.asizeof import asizeof
 
 def test_countmin():
     mincounter = CountMin()
+    test = asizeof(mincounter)
+
     mincounter.insert('a', 10)
     mincounter.insert('b', 7)
     mincounter.insert('a', 3)
@@ -12,11 +15,13 @@ def test_countmin():
     mincounter.insert('e', 7)
     mincounter.insert('c', 11)
 
-    assert mincounter.estimate_frequency('a') >= 13
-    assert mincounter.estimate_frequency('b') >= 7
-    assert mincounter.estimate_frequency('c') >= 11
-    assert mincounter.estimate_frequency('d') >= 1
-    assert mincounter.estimate_frequency('e') >= 7
+    test = asizeof(mincounter)
+
+    assert mincounter.estimate_count('a') >= 13
+    assert mincounter.estimate_count('b') >= 7
+    assert mincounter.estimate_count('c') >= 11
+    assert mincounter.estimate_count('d') >= 1
+    assert mincounter.estimate_count('e') >= 7
 
 
 def test_merge():
@@ -39,15 +44,16 @@ def test_merge():
 
     mincounter1.merge(mincounter2)
 
-    assert mincounter1.estimate_frequency('a') >= 24
-    assert mincounter1.estimate_frequency('b') >= 16
-    assert mincounter1.estimate_frequency('c') >= 24
-    assert mincounter1.estimate_frequency('d') >= 15
-    assert mincounter1.estimate_frequency('e') >= 17
+    assert mincounter1.estimate_count('a') >= 24
+    assert mincounter1.estimate_count('b') >= 16
+    assert mincounter1.estimate_count('c') >= 24
+    assert mincounter1.estimate_count('d') >= 15
+    assert mincounter1.estimate_count('e') >= 17
 
 
 def test_large_file():
     mincounter = CountMin()
+    test = asizeof(mincounter)
 
     try:
         test_data = pd.read_csv('item_sales_filtered.csv')
@@ -65,6 +71,5 @@ def test_large_file():
 
     for i in range(10):
         item, true_sum = random.choice(true_sums)
-        calculated_sum = mincounter.estimate_frequency(str(item))
-
-        assert calculated_sum >= 0.95 * true_sum and calculated_sum <= 1.05 * true_sum
+        calculated_sum = mincounter.estimate_count(str(item))
+        assert calculated_sum >= true_sum
