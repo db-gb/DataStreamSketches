@@ -14,7 +14,7 @@ class F2Estimate():
         self.epsilon = epsilon
         self.delta = delta
         self.hash_type = hash_type
-        self.max_32_int = pow(2, 32)-1
+        self.max_128_int = pow(2, 128)-1
 
         # store the basic sketch values in a table
         self.width = c * int(1/(self.epsilon*self.epsilon))
@@ -27,7 +27,7 @@ class F2Estimate():
         Compute the {-1,+1} hash of a token
         """
         if self.hash_type == "mmh3":
-            x = mmh3.hash(token, seed, signed=False)/self.max_32_int
+            x = mmh3.hash128(token, seed, signed=False)/self.max_128_int
             if x <= 0.5:
                 return -1
             else:

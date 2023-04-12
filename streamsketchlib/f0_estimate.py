@@ -17,7 +17,7 @@ class F0Estimate:
         """
         self.epsilon = epsilon
         self.hash_type = hash_type
-        self.max_32_int = pow(2, 32)-1
+        self.max_128_int = pow(2, 128)-1
 
         # width ~ c/eps^2 and depth ~ c log(1/delta)
         self.width = c*int(math.pow(1/self.epsilon, 2))
@@ -40,7 +40,7 @@ class F0Estimate:
     def _hash(self, token, seed):
         """ Compute the hash of a token. """
         if self.hash_type == "mmh3":
-            return mmh3.hash(token, seed, signed=False)/self.max_32_int
+            return mmh3.hash128(token, seed, signed=False)/self.max_128_int
 
     def insert(self, token):
         """ Insert a token into the sketch. Token must be byte-like objects. """
