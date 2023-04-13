@@ -21,7 +21,7 @@ class BloomFilter:
 
     def _hash(self, token, seed):
         x = mmh3.hash128(token, seed, signed=False)/self.max_128_int
-        return int(x*self.m)
+        return int(x*(self.m-1))
     
     def insert(self, x):
         for i in range(self.k):
