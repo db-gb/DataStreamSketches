@@ -29,7 +29,7 @@ class CountMin:
         new_cm.epsilon = original_cm.epsilon
         new_cm.delta = original_cm.delta
         new_cm.width = original_cm.width
-        new_cm.t = original_cm.depth
+        new_cm.depth = original_cm.depth
         new_cm.table = [[0 for _ in range(new_cm.width)]
                         for __ in range(new_cm.depth)]
         new_cm._hash_seeds = original_cm._hash_seeds
