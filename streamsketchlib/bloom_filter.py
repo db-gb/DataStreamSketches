@@ -1,11 +1,12 @@
 import mmh3 
 import math
 
+
 class BloomFilter:
     """
     Bloom Filter
     """
-    def __init__(self, n = 10000, delta = 0.01, seed = 42):
+    def __init__(self, n=10000, delta=0.01, seed=42):
         """
         n: the maximum number of insertions
         delta: false positive rate 
@@ -16,7 +17,7 @@ class BloomFilter:
         self.k = math.ceil(math.log(1/delta))
         self.max_128_int = pow(2, 128)-1
 
-        self.B = [False for i in range(self.m)]
+        self.B = [False for _ in range(self.m)]
         self.seeds = [seed*i for i in range(self.k)]
 
     def _hash(self, token, seed):
@@ -29,7 +30,6 @@ class BloomFilter:
 
     def membership(self, x):
         for i in range(self.k):
-            if self.B[self._hash(x, self.seeds[i])] == False:
+            if self.B[self._hash(x, self.seeds[i])] is False:
                 return False
         return True
-
