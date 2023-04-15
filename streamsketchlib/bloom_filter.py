@@ -17,19 +17,27 @@ class BloomFilter:
         self.k = math.ceil(math.log(1/delta))
         self.max_128_int = pow(2, 128)-1
 
-        self.B = [False for _ in range(self.m)]
+        self.B = [0 for _ in range(self.m)]
         self.seeds = [seed*i for i in range(self.k)]
 
     def _hash(self, token, seed):
         x = mmh3.hash128(token, seed, signed=False)/self.max_128_int
         return int(x*(self.m-1))
     
+    def delete(self, x):
+        for i in range(self.k):
+            self.B[self._hash(x, self.seeds[i])] -= 1
+
+    def merge(self, X):
+        for i in range(len(self.B)):
+            self.B[i] += X.B[i]
+
     def insert(self, x):
         for i in range(self.k):
-            self.B[self._hash(x, self.seeds[i])] = True
+            self.B[self._hash(x, self.seeds[i])] += 1
 
     def membership(self, x):
         for i in range(self.k):
-            if self.B[self._hash(x, self.seeds[i])] is False:
+            if self.B[self._hash(x, self.seeds[i])] == 0:
                 return False
         return True
