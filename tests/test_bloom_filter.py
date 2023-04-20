@@ -12,8 +12,11 @@ def test_bloom_filter_1():
     for i in range(test_n):
         test_bf.insert(str(i))
 
+    result = True
     for i in range(test_n):
-        assert test_bf.membership(str(i))
+        if not test_bf.membership(str(i)):
+            result = False
+    assert result
 
     false_positives = []
 
