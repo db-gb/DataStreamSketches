@@ -1,8 +1,9 @@
 from streamsketchlib.count_min import CountMin
 from heapq import heappush, heappop, heapify
+from heavy_hitters import AbstractHeavyHittersAlgorithm
 
 
-class HeavyHittersCMRegister:
+class HeavyHittersCMRegister(AbstractHeavyHittersAlgorithm):
     """ This class solves the heavy hitters problem using a count-min data
         structure. It works only for the cash register model of a stream where
         each token count must be greater than 0 (c > 0)."""
