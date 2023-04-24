@@ -1,12 +1,6 @@
 ## F2Estimate
 
-This class provides a space and time efficient sketch to estimate the second moment of a data stream up to a factor (1 +- epsilon) with probability at least 1-delta in a data stream. 
-
-This is often referred to as the surprise number, since it measures how uneven the distribution of elements in the stream is. For example, the frquency moment of the following stream 
-
-("apple", 2), ("orange", 1), ("apple", 3), ("mango", 4), ("orange", 1)
-
-is `(2+3)^2 + (1+1)^2 + 4^2 = 45`.
+This class provides a space and time efficient data structure to estimate the second moment of a data stream up to a factor `(1 ± epsilon)` with probability at least `1-delta`. 
 
 This is an implementation of the Tug-of-War sketch algorithm in the paper "The Space Complexity of Approximating the Frequency Moments" by Noga Alon, Yossi Matias, Mario Szegedy.
 
@@ -16,6 +10,23 @@ To import the class, use the following:
 from streamsketchlib.f2_estimate import F2Estimate
 ```
 
+### Overview
+
+The second frequency moment is often referred to as the surprise number, since it measures how uneven the distribution of elements in the stream is. For example, the frequency moment of the following stream 
+
+("apple", 2), ("orange", 1), ("apple", 3), ("mango", 4), ("orange", 1)
+
+is `(2+3)^2 + (1+1)^2 + 4^2 = 45`.
+
+The data structure uses roughly `O~(1/eps^2 * log(1/delta))` memory (excluding overheads). 
+The update time is `O(1/eps^2 log (1/delta))`. It supports the following operations:
+
+- insert a weighted token into the stream.
+- return the estimate of the second frequency moment of the stream up to a factor `1±eps` with probability at least `1-delta`.
+- combine the sketches of two streams so that we can estimate the second frequency moment of the combined stream.
+
+
+
 ### Initialization
 
 To initialize an instance of this class, we can specify the following parameters:
@@ -24,10 +35,7 @@ To initialize an instance of this class, we can specify the following parameters
 - `epsilon`: controls the estimate's quality. The default value is `0.01`.
 - `seed`: the seed for randomness. The default value is `42`.
 
-The algorithm will use roughly `O~(1/eps^2 * log(1/delta))` memory (excluding overheads). 
-The update time is `O(1/eps^2 log (1/delta))`.
-
-Examples of initialize an instance of F0Esimate:
+For example,
 
 ```python
 stream = F2Estimate(delta=0.01, epsilon=0.05, seed=42)
@@ -52,10 +60,9 @@ At this point, the count of "apple" is 6 and the count of "orange" is 2. Therefo
 
 ### Estimator
 
-Return the estimate of the number of distinct elements that have appeared in the stream so far up to a factor (1 +- epsilon) with probability at least 1-delta.
+Return the estimate of the number of distinct elements that have appeared in the stream so far up to a factor (1 ± epsilon) with probability at least 1-delta.
 
 For example,
-
 
 ```python
 stream = F2Estimate(delta=0.01, epsilon=0.05, seed=42)
@@ -69,7 +76,7 @@ print(stream.estimator())
 
 ```
 
-### Merges
+### Merge
 
 Merge with another sketch with the same seed. The resulted sketch will provide answer to the combine streams.
 

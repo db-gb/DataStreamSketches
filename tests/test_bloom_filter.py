@@ -1,9 +1,6 @@
 from streamsketchlib.bloom_filter import BloomFilter
 
 
-from streamsketchlib.bloom_filter import BloomFilter
-
-
 def test_bloom_filter_1():
     test_n = 1000000
 
