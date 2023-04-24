@@ -12,7 +12,6 @@ class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
         self.epsilon = epsilon
         self.delta = delta
         self.seed = seed
-        self.algorithm = algorithm
         self._heavy_hitters_finder = None
 
         if algorithm == HeavyHittersFinder.COUNTMIN:
@@ -42,10 +41,9 @@ class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
         new_hh.epsilon = original.epsilon
         new_hh.delta = original.delta
         new_hh.phi = original.phi
-        new_hh.algorithm = original.algorithm
 
-        if original.algorithm == HeavyHittersFinder.COUNTMIN:
-            new_hh._heavy_hitters_finder = CountMinCashRegister\
-                .from_existing(original._heavy_hitters_finder)
+        algorithm_class = original._heavy_hitters_finder.__class__
+        new_hh._heavy_hitters_finder = algorithm_class\
+            .from_existing(original._heavy_hitters_finder)
 
         return new_hh
