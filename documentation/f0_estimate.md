@@ -1,12 +1,14 @@
 ## F0Estimate
 
-
 This class provides a space and time efficient sketch to estimate the number of distinct element up to a factor (1 +- epsilon) with probability at least 1-delta in a data stream.
 
 This is an implementation of the first algorithm in the paper "Counting Distinct Elements in a Data Stream" by Ziv Bar-Yossef, T. S. Jayram, Ravi Kumar, D. Sivakumar & Luca Trevisan.
 
+To import the class, use the following:
 
-
+```python
+from streamsketchlib.f0_estimate import F0Estimate
+```
 
 ### Initialization
 
@@ -44,7 +46,6 @@ stream.insert("apple")
 Return the estimate of the number of distinct elements that have appeared in the stream so far up to a factor (1 +- epsilon) with probability at least 1-delta.
 
 For example,
-
 
 ```python
 stream = F0Estimate(delta=0.01, epsilon=0.05, seed=42)
