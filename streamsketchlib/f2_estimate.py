@@ -15,11 +15,11 @@ class F2Estimate():
         self.delta = delta
         self.hash_type = hash_type
         self.max_128_int = pow(2, 128)-1
-        self.c = 3
+        self.c = 3 
 
         # store the basic sketch values in a table
-        self.width = c * int(1/(self.epsilon*self.epsilon))
-        self.depth = c * int(math.log(1/self.delta,2))
+        self.width = self.c * int(1/(self.epsilon*self.epsilon))
+        self.depth = self.c * int(math.log(1/self.delta,2))
         self.table = [[0 for j in range(self.width)] for i in range(self.depth)]
         self.seeds = [[seed*i*j for j in range(self.width)] for i in range(self.depth)]
 
@@ -63,6 +63,16 @@ class F2Estimate():
             row = [self.table[i][j]*self.table[i][j] for j in range(self.width)]
             avg.append(sum(row)/self.width)
         return statistics.median(avg)
+    
+    @classmethod
+    def from_existing(cls, original):
+        """ Creates a new sketch based on the parameters of an existing sketch.
+            Two sketches are mergeable iff they share array size and hash
+            seeds. Therefore, to create mergeable sketches, use an original to
+            create new instances. """
+        new_f2_sk = F2Estimate(epsilon = original.epsilon, delta = original.delta, \
+                               hash_type= original.hash_type, seed = original.seed)
+        return new_f2_sk
 
 
 

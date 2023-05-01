@@ -41,3 +41,10 @@ class BloomFilter:
             if self.B[self._hash(x, self.seeds[i])] == 0:
                 return False
         return True
+    
+    @classmethod
+    def from_existing(cls, original):
+        """ Creates a new Bloom Filter based on existing Bloom Filter with similar parameters
+        so that they are mergeable."""
+        new_filter = BloomFilter(n = original.n, delta = original.delta, seed = original.seed)
+        return new_filter

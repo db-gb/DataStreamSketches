@@ -6,7 +6,7 @@ class DistinctCount(AbstractDistinctCountAlgorithm):
 
     BJKST_1 = 1
 
-    def __init__(self, epsilon=0.01, delta=0.01, hash_type="mmh3", seed=42, algorithm=BJKST_1):
+    def __init__(self, epsilon=0.01, delta=0.01, algorithm=BJKST_1, hash_type="mmh3", seed=42):
         """ epsilon: relative error
         delta: failure probability
         """

@@ -103,7 +103,7 @@ def test_bloom_filter_5():
     delta = 0.1
     n = 1000
     B = BloomFilter(n = 2*n, delta = delta)
-    C = BloomFilter(n = 2*n, delta = delta)
+    C = BloomFilter.from_existing(B)
     result = True
     false_positive = 0
 
