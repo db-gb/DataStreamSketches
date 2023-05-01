@@ -4,7 +4,7 @@ import math
 
 class F2Estimate():
 
-    def __init__(self, epsilon=0.01, delta=0.01, c=3, hash_type="mmh3", seed=42):
+    def __init__(self, epsilon=0.01, delta=0.01, hash_type="mmh3", seed=42):
         """ 
         estimate the second frequency moment of a stream using the tug-of-war sketch.
         epsilon: relative error, 
@@ -15,6 +15,7 @@ class F2Estimate():
         self.delta = delta
         self.hash_type = hash_type
         self.max_128_int = pow(2, 128)-1
+        self.c = 3
 
         # store the basic sketch values in a table
         self.width = c * int(1/(self.epsilon*self.epsilon))
