@@ -1,16 +1,34 @@
+from abc import abstractmethod
 import mmh3
 import math
 import bisect
 from bisect import bisect_left
 import statistics
 
+class AbstractDistinctCountAlgorithm:
+    @abstractmethod
+    def insert(self, token):
+        pass
+    
+    @abstractmethod
+    def merge(self, another_sketch):
+        pass
+        
+    @abstractmethod
+    def estimator(self):
+        pass
 
-class F0Estimate:
+    @abstractmethod
+    def from_existing(cls, original):
+        pass
+
+
+class BJKST_1(AbstractDistinctCountAlgorithm):
     """
     Loglog algorithm: memory efficient data structure to estimate
     the number of distinct elements in streams
     """
-    def __init__(self, epsilon=0.01, delta=0.01, c=2, hash_type="mmh3", seed=42):
+    def __init__(self, epsilon=0.01, delta=0.01, hash_type="mmh3", seed=42):
         """ epsilon: relative error
         delta: failure probability
         This is the first algorithm of [BJKST02]
@@ -18,10 +36,12 @@ class F0Estimate:
         self.epsilon = epsilon
         self.hash_type = hash_type
         self.max_128_int = pow(2, 128)-1
+        self.delta = delta
+        self.c = 2
 
         # width ~ c/eps^2 and depth ~ c log(1/delta)
-        self.width = c*int(math.pow(1/self.epsilon, 2))
-        self.depth = c*int(math.log(1/delta, 2))
+        self.width = self.c*int(math.pow(1/self.epsilon, 2))
+        self.depth = self.c*int(math.log(1/self.delta, 2))
         self.seeds = [seed*i for i in range(self.depth)]
 
         # data structure to store the smallest t hash values
@@ -66,7 +86,6 @@ class F0Estimate:
                 self.naive_lst.add(x)
             else:
                 break
-
         # merge the smallest hash values
         for i in range(self.depth):
             for x in S.table[i]:
@@ -81,10 +100,31 @@ class F0Estimate:
     def estimator(self):
         """ Return the estimate for the number of distinct
         elements inserted so far """
-        #start_time = time.time()
         if len(self.naive_lst) < self.width:
             result = len(self.naive_lst)
             return result
         est = [int(self.width/self.table[i][self.width-1]) for i in range(self.depth)]
         median_of_est = statistics.median(est)
         return int(median_of_est)
+    
+    @classmethod
+    def from_existing(cls, original):
+        """ Creates a new sketch based on the parameters of an existing sketch.
+            Two sketches are mergeable iff they share array size and hash
+            seeds. Therefore, to create mergeable sketches, use an original to
+            create new instances. """
+        new_f0_sk = cls()
+        new_f0_sk.epsilon = original.epsilon
+        new_f0_sk.delta = original.delta
+        new_f0_sk.seeds = original.seeds
+        new_f0_sk.width = original.width
+        new_f0_sk.depth = original.depth
+        new_f0_sk.table = [[] for i in range(new_f0_sk.depth)]
+        new_f0_sk.naive_lst = set()
+        return new_f0_sk
+
+
+
+
+
+    
