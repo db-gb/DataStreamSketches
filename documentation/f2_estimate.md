@@ -1,6 +1,6 @@
 ## F2Estimate
 
-This class provides a space and time efficient data structure to estimate the second moment of a data stream up to a factor `(1 ± epsilon)` with probability at least `1-delta`. 
+This class provides a space and time efficient data structure to estimate (called a sketch) the second moment of a data stream up to a factor `(1 ± epsilon)` with probability at least `1-delta`. 
 
 This is an implementation of the Tug-of-War sketch algorithm in the paper "The Space Complexity of Approximating the Frequency Moments" by Noga Alon, Yossi Matias, Mario Szegedy.
 
@@ -85,6 +85,32 @@ For example,
 ```python
 stream = F2Estimate(delta=0.01, epsilon=0.05, seed=42)
 stream2 = F2Estimate(delta=0.01, epsilon=0.05, seed=42)
+
+stream.insert("apple", 2)
+stream.insert("orange", 2)
+stream.insert("apple", 4)
+
+stream2.insert("apple", 3)
+stream2.insert("orange", 1)
+stream2.insert("apple", 2)
+stream2.insert("pineapple", 5)
+
+stream.merge(stream2)
+
+print(stream.estimator())
+
+>>> 155.9206349206349
+
+```
+
+### From Existing 
+
+Create a new sketch with similar parameter so that they can be merged later.
+
+For example,
+```python
+stream = F2Estimate(delta=0.01, epsilon=0.05, seed=42)
+stream2 = F2Estimate.from_existing(stream)
 
 stream.insert("apple", 2)
 stream.insert("orange", 2)

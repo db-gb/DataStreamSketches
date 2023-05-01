@@ -1,18 +1,16 @@
-## F0Estimate
+## Distinct Count
 
-This class provides a space and time efficient data structure to estimate the number of distinct element up to a factor `(1 ± epsilon)` with probability at least `1-delta` in a data stream.
+This class provides a space and time efficient data structure (called a sketch) to estimate the number of distinct element up to a factor `(1 ± epsilon)` with probability at least `1-delta` in a data stream.
 
-This is an implementation of the first algorithm in the paper "Counting Distinct Elements in a Data Stream" by Ziv Bar-Yossef, T. S. Jayram, Ravi Kumar, D. Sivakumar & Luca Trevisan.
 
 To import the class, use the following:
 
 ```python
-from streamsketchlib.f0_estimate import F0Estimate
+from streamsketchlib.distinct_count import DistinctCount
 ```
 
 ### Overview
 
-The data structure uses roughly `O~(1/eps^2 * log(1/delta))` memory (excluding overheads). 
 The update time is `O(log 1/eps)`. It supports the following operations:
 
 - insert a token to the stream.
@@ -26,12 +24,16 @@ To initialize an instance of this class, we can specify the following parameters
 - `delta`: controls the failure probability. The default value is `0.01`.
 - `epsilon`: controls the estimate's quality. The default value is `0.01`.
 - `seed`: the seed for randomness. The default value is `42`.
+- `algorithm`:
+    -`BJKST_1` (default) : This is an implementation of the first algorithm in the paper "Counting Distinct Elements in a Data Stream" by Ziv Bar-Yossef, T. S. Jayram, Ravi Kumar, D. Sivakumar & Luca Trevisan. The data structure uses roughly `O~(1/eps^2 * log(1/delta))` memory (excluding overheads). This is currently the only implementation.
+
+ 
 
 For example,
 
 ```python
-stream = F0Estimate(delta=0.01, epsilon=0.05, seed=42)
-stream2 = F0Estimate()
+stream = DistinctCount(delta=0.01, epsilon=0.05, seed=42)
+stream2 = DistinctCount()
 ```
 
 ### Insert
@@ -41,7 +43,7 @@ Insert a new token into the stream. The token must be byte-like objects. The eas
 For example,
 
 ```python
-stream = F0Estimate(delta=0.01, epsilon=0.05, seed=42)
+stream = DistinctCount(delta=0.01, epsilon=0.05, seed=42)
 stream.insert("apple")
 stream.insert("orange")
 stream.insert("apple")
@@ -54,7 +56,7 @@ Return the estimate of the number of distinct elements that have appeared in the
 For example,
 
 ```python
-stream = F0Estimate(delta=0.01, epsilon=0.05, seed=42)
+stream = DistinctCount(delta=0.01, epsilon=0.05, seed=42)
 
 for i in range(100, 200):
     stream.insert(str(i))
@@ -75,8 +77,31 @@ Merge with another sketch with the same seed. The resulted sketch will provide a
 For example,
 
 ```python
-stream = F0Estimate(delta=0.01, epsilon=0.05, seed=42)
-stream2 = F0Estimate(delta=0.01, epsilon=0.05, seed=42)
+stream = DistinctCount(delta=0.01, epsilon=0.05, seed=42)
+stream2 = DistinctCount(delta=0.01, epsilon=0.05, seed=42)
+
+for i in range(100, 200):
+    stream.insert(str(i))
+
+for i in range(150, 250):
+    stream2.insert(str(i))
+
+stream.merge(stream2)
+print(stream.estimator())
+
+>>> 150
+
+```
+
+### From Existing 
+
+Create a new sketch with similar parameter so that they can be merged later.
+
+For example,
+
+```python
+stream = DistinctCount(delta=0.01, epsilon=0.05, seed=42)
+stream2 = DistinctCount.from_existing(stream)
 
 for i in range(100, 200):
     stream.insert(str(i))

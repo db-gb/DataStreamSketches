@@ -113,23 +113,55 @@ To delete an element from the set, use the delete function. However, note that t
 
 For example,
 
+
 ```python
-delta = 0.0001
-n = 10000
+delta = 0.05
+n = 1000
+B = BloomFilter(n = 2*n, delta = delta)
+C = BloomFilter(n = 2*n, delta = delta)
 false_positives = 0
-B = BloomFilter(n = n, delta = delta)
 
 for i in range(n):
     B.insert(str(i))
 
-for j in range(int(n/2)):
-    B.delete(str(j))
+for i in range(int(n/2), int((3/2)*n)):
+    C.insert(str(i))
 
-for j in range(n):
-    if j < n/2 and B.membership(str(j)) == True:
+B.merge(C)
+
+for j in range(2*n):
+    if j >= (3/2)*n and B.membership(str(j)) == True:
         false_positives += 1
 
 print(false_positives)
 
->>> 0
+>>> 12
+```
+
+### From Existing 
+
+Create a new Bloom Filter with similar parameters so that they can be merged later.
+
+```python
+delta = 0.05
+n = 1000
+B = BloomFilter(n = 2*n, delta = delta)
+C = BloomFilter.from_existing(B)
+false_positives = 0
+
+for i in range(n):
+    B.insert(str(i))
+
+for i in range(int(n/2), int((3/2)*n)):
+    C.insert(str(i))
+
+B.merge(C)
+
+for j in range(2*n):
+    if j >= (3/2)*n and B.membership(str(j)) == True:
+        false_positives += 1
+
+print(false_positives)
+
+>>> 12
 ```
