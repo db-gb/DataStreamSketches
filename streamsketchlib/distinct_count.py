@@ -38,5 +38,3 @@ class DistinctCount(AbstractDistinctCountAlgorithm):
         new_distinct_counter._f0_sketch = algorithm_class.from_existing(original._f0_sketch)
 
         return new_distinct_counter
-
-    
