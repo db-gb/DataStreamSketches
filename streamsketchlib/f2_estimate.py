@@ -76,9 +76,3 @@ class F2Estimate():
         return new_f2_sk
 
 
-
-
-
-
-
-

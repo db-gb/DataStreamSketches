@@ -25,3 +25,4 @@ class RsvSampling:
     def reservoir(self):
         """ Return the list of sampled tokens """
         return self.rsv
+    

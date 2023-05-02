@@ -24,7 +24,6 @@ def test_f2_merge():
 
     S1 = F2Estimate(epsilon = epsilon, delta = delta)
     S2 = F2Estimate.from_existing(S1)
-    f = {}
 
     S1.insert('a', 10)
     S1.insert('b', 5)
