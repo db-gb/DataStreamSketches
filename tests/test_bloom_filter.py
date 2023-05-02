@@ -128,3 +128,9 @@ def test_bloom_filter_5():
             false_positive += 1
     assert(false_positive <= 1.1*delta*(1/2)*n)
     
+if __name__ == '__main__':
+    test_bloom_filter_1()
+    test_bloom_filter_2()
+    test_bloom_filter_3()
+    test_bloom_filter_4()
+    test_bloom_filter_5()

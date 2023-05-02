@@ -15,13 +15,14 @@ class F2Estimate():
         self.delta = delta
         self.hash_type = hash_type
         self.max_128_int = pow(2, 128)-1
+        self.seed = seed
         self.c = 3 
 
         # store the basic sketch values in a table
         self.width = self.c * int(1/(self.epsilon*self.epsilon))
         self.depth = self.c * int(math.log(1/self.delta,2))
         self.table = [[0 for j in range(self.width)] for i in range(self.depth)]
-        self.seeds = [[seed*i*j for j in range(self.width)] for i in range(self.depth)]
+        self.seeds = [[self.seed*i*j for j in range(self.width)] for i in range(self.depth)]
 
     def _hash(self, token, seed):
         """ 

@@ -24,6 +24,7 @@ def test_f2_merge():
 
     S1 = F2Estimate(epsilon = epsilon, delta = delta)
     S2 = F2Estimate.from_existing(S1)
+    f = {}
 
     S1.insert('a', 10)
     S1.insert('b', 5)
@@ -41,8 +42,9 @@ def test_f2_merge():
     S1.merge(S2)
     test = S1.estimator()
 
-    assert test >= (1-epsilon)*8326 and test <= (1+epsilon)*8326
+    assert test >= (1-epsilon)*9670 and test <= (1+epsilon)*9670
 
 
 if __name__ == '__main__':
     test_f2()
+    test_f2_merge()

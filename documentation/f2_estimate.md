@@ -105,7 +105,7 @@ print(stream.estimator())
 
 ### From Existing 
 
-Create a new sketch with similar parameter so that they can be merged later.
+Create a new sketch with similar parameters so that they can be merged later.
 
 For example,
 ```python

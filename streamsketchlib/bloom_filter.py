@@ -18,7 +18,8 @@ class BloomFilter:
         self.max_128_int = pow(2, 128)-1
 
         self.B = [0 for _ in range(self.m)]
-        self.seeds = [seed*i for i in range(self.k)]
+        self.seed = seed
+        self.seeds = [self.seed*i for i in range(self.k)]
 
     def _hash(self, token, seed):
         x = mmh3.hash128(token, seed, signed=False)/self.max_128_int
