@@ -1,6 +1,7 @@
 import mmh3
 import statistics
 import math
+from copy import deepcopy
 
 class F2Estimate():
 
@@ -14,8 +15,8 @@ class F2Estimate():
         self.epsilon = epsilon
         self.delta = delta
         self.hash_type = hash_type
-        self.max_128_int = pow(2, 128)-1
         self.seed = seed
+        self.max_128_int = pow(2, 128)-1
         self.c = 3 
 
         # store the basic sketch values in a table
@@ -45,6 +46,14 @@ class F2Estimate():
             for j in range(self.width):
                 self.table[i][j] += self._hash(x, self.seeds[i][j])*y
 
+    def __add__(self, S):
+        merged_sketch = F2Estimate.from_existing(self)
+        merged_sketch.table = deepcopy(self.table)
+        for i in range(merged_sketch.depth):
+            for j in range(merged_sketch.width):
+                merged_sketch.table[i][j] += S.table[i][j]
+        return merged_sketch
+
     def merge(self, S):
         """
         Merge with another F2 sketch S.
@@ -71,8 +80,8 @@ class F2Estimate():
             Two sketches are mergeable iff they share array size and hash
             seeds. Therefore, to create mergeable sketches, use an original to
             create new instances. """
-        new_f2_sk = F2Estimate(epsilon = original.epsilon, delta = original.delta, \
+        new_f2_sketch = F2Estimate(epsilon = original.epsilon, delta = original.delta, \
                                hash_type= original.hash_type, seed = original.seed)
-        return new_f2_sk
+        return new_f2_sketch
 
 

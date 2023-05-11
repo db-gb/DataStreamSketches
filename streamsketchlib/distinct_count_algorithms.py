@@ -4,6 +4,7 @@ import math
 import bisect
 from bisect import bisect_left
 import statistics
+from copy import deepcopy 
 
 class AbstractDistinctCountAlgorithm:
     @abstractmethod
@@ -22,6 +23,10 @@ class AbstractDistinctCountAlgorithm:
     def from_existing(cls, original):
         pass
 
+    @abstractmethod
+    def __add__(self, S):
+        pass
+
 
 class BJKST_1(AbstractDistinctCountAlgorithm):
     """
@@ -34,15 +39,16 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
         This is the first algorithm of [BJKST02]
         """
         self.epsilon = epsilon
-        self.hash_type = hash_type
-        self.max_128_int = pow(2, 128)-1
         self.delta = delta
+        self.hash_type = hash_type
+        self.seed = seed
+        self.max_128_int = pow(2, 128)-1
         self.c = 2
-
+        
         # width ~ c/eps^2 and depth ~ c log(1/delta)
         self.width = self.c*int(math.pow(1/self.epsilon, 2))
         self.depth = self.c*int(math.log(1/self.delta, 2))
-        self.seeds = [seed*i for i in range(self.depth)]
+        self.seeds = [self.seed*i for i in range(self.depth)]
 
         # data structure to store the smallest t hash values
         self.table = [[] for i in range(self.depth)]
@@ -70,7 +76,6 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
         for i in range(self.depth):
             hash_value = self._hash(token, self.seeds[i])
             j = self._binary_search(self.table[i], hash_value)
-
             if j == -1:
                 if len(self.table[i]) < self.width:
                     bisect.insort(self.table[i], hash_value)
@@ -97,6 +102,30 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
                         bisect.insort(self.table[i], x)
                         self.table[i].pop()
 
+    def __add__(self, S):
+        """ Return the merged sketch of self and S
+        """
+        merged_sk = BJKST_1.from_existing(self)
+        merged_sk.table = deepcopy(self.table)
+        merged_sk.naive_lst = deepcopy(self.naive_lst)
+        # merge the small lists
+        for x in S.naive_lst:
+            if len(merged_sk.naive_lst) < merged_sk.width:
+                merged_sk.naive_lst.add(x)
+            else:
+                break
+        # merge the smallest hash values
+        for i in range(merged_sk.depth):
+            for x in S.table[i]:
+                j = merged_sk._binary_search(merged_sk.table[i], x)
+                if j  == -1:
+                    if len(merged_sk.table[i]) < merged_sk.width:
+                        bisect.insort(merged_sk.table[i], x)
+                    elif merged_sk.table[i][merged_sk.width-1] > x:
+                        bisect.insort(merged_sk.table[i], x)
+                        merged_sk.table[i].pop()
+        return merged_sk
+
     def estimator(self):
         """ Return the estimate for the number of distinct
         elements inserted so far """
@@ -113,18 +142,6 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
             Two sketches are mergeable iff they share array size and hash
             seeds. Therefore, to create mergeable sketches, use an original to
             create new instances. """
-        new_f0_sk = cls()
-        new_f0_sk.epsilon = original.epsilon
-        new_f0_sk.delta = original.delta
-        new_f0_sk.seeds = original.seeds
-        new_f0_sk.width = original.width
-        new_f0_sk.depth = original.depth
-        new_f0_sk.table = [[] for i in range(new_f0_sk.depth)]
-        new_f0_sk.naive_lst = set()
-        return new_f0_sk
+        new_f0_sketch = cls(epsilon=original.epsilon, delta=original.delta, hash_type=original.hash_type, seed = original.seed)
+        return new_f0_sketch
 
-
-
-
-
-    

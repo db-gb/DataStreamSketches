@@ -12,10 +12,11 @@ class DistinctCount(AbstractDistinctCountAlgorithm):
         """
         self.epsilon = epsilon
         self.delta = delta
+        self.algorithm = algorithm
         self.hash_type = hash_type
         self.seed = seed
 
-        if algorithm == DistinctCount.BJKST_1:
+        if self.algorithm == DistinctCount.BJKST_1:
             self._f0_sketch = BJKST_1(epsilon = self.epsilon, delta = self.delta, hash_type = self.hash_type, seed = self.seed)
 
     def insert(self, token):
@@ -26,15 +27,16 @@ class DistinctCount(AbstractDistinctCountAlgorithm):
 
     def merge(self, another_sketch):
         self._f0_sketch.merge(another_sketch._f0_sketch)
+
+    def __add__(self, S):
+        merged_sketch = DistinctCount.from_existing(self)
+        merged_sketch._f0_sketch = self._f0_sketch + S._f0_sketch
+        return merged_sketch
     
     @classmethod
     def from_existing(cls, original):
-        new_distinct_counter = cls()
-        new_distinct_counter.epsilon = original.epsilon
-        new_distinct_counter.delta = original.delta
-        new_distinct_counter.phi = original.hash_type
-
-        algorithm_class = original._f0_sketch.__class__
-        new_distinct_counter._f0_sketch = algorithm_class.from_existing(original._f0_sketch)
-
+        new_distinct_counter = cls(epsilon=original.epsilon, delta=original.delta, \
+                                             algorithm=original.algorithm, hash_type=original.hash_type,\
+                                                seed=original.seed)
         return new_distinct_counter
+
