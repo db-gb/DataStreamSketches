@@ -39,7 +39,7 @@ n = 1000
 B = BloomFilter(n = n, delta = delta, seed = 50)
 ```
 
-### Insert
+### insert
 
 To insert an element into the set, the element must be a byte-like object. The simplest approach is to convert an object to a string. 
 For example,
@@ -53,61 +53,7 @@ for i in range(n):
     B.insert(str(i))
 ```
 
-### Membership
-
-Check if an element is in the set, use the membership query function. However, there is a probability `delta` of false positives, meaning the function may incorrectly return `True` for an element that is not in the set. 
-
-For example,
-
-```python
-delta = 0.0001
-n = 10000
-false_positives = 0
-B = BloomFilter(n = n, delta = delta)
-
-for i in range(n):
-    B.insert(str(i))
-
-for j in range(2*n):
-    if j >= n and B.membership(str(j)) == True:
-        false_positives += 1
-        
-print(false_positives)
-
->>> 1
-```
-
-### Merge
-
-To merge two Bloom Filters with the same seed, use the merge function. The resulting filter will provide the answer to the union of two sets. 
-
-For example,
-
-```python
-delta = 0.05
-n = 1000
-B = BloomFilter(n = 2*n, delta = delta)
-C = BloomFilter(n = 2*n, delta = delta)
-false_positives = 0
-
-for i in range(n):
-    B.insert(str(i))
-
-for i in range(int(n/2), int((3/2)*n)):
-    C.insert(str(i))
-
-B.merge(C)
-
-for j in range(2*n):
-    if j >= (3/2)*n and B.membership(str(j)) == True:
-        false_positives += 1
-
-print(false_positives)
-
->>> 12
-```
-
-### Delete
+### delete
 
 To delete an element from the set, use the delete function. However, note that the overall correctness is only guaranteed if the element exists in the set. 
 
@@ -138,7 +84,90 @@ print(false_positives)
 >>> 12
 ```
 
-### From Existing 
+### membership
+
+Check if an element is in the set, use the membership query function. However, there is a probability `delta` of false positives, meaning the function may incorrectly return `True` for an element that is not in the set. 
+
+For example,
+
+```python
+delta = 0.0001
+n = 10000
+false_positives = 0
+B = BloomFilter(n = n, delta = delta)
+
+for i in range(n):
+    B.insert(str(i))
+
+for j in range(2*n):
+    if j >= n and B.membership(str(j)) == True:
+        false_positives += 1
+        
+print(false_positives)
+
+>>> 1
+```
+
+### merge
+
+To merge with another Bloom filter with the same seed, use the merge function. The resulting filter will provide the answer to the union of two sets. 
+
+For example,
+
+```python
+delta = 0.05
+n = 1000
+B = BloomFilter(n = 2*n, delta = delta)
+C = BloomFilter(n = 2*n, delta = delta)
+false_positives = 0
+
+for i in range(n):
+    B.insert(str(i))
+
+for i in range(int(n/2), int((3/2)*n)):
+    C.insert(str(i))
+
+B.merge(C)
+
+for j in range(2*n):
+    if j >= (3/2)*n and B.membership(str(j)) == True:
+        false_positives += 1
+
+print(false_positives)
+
+>>> 12
+```
+
+### + operator
+
+Merge two Bloom filters A and B with the same seeds.  The resulting filter will provide the answer to the union of two sets. 
+In other words, A = A + B is the same as A.merge(B).
+
+```python
+delta = 0.05
+n = 1000
+B = BloomFilter(n = 2*n, delta = delta)
+C = BloomFilter(n = 2*n, delta = delta)
+false_positives = 0
+
+for i in range(n):
+    B.insert(str(i))
+
+for i in range(int(n/2), int((3/2)*n)):
+    C.insert(str(i))
+
+B = B + C
+
+for j in range(2*n):
+    if j >= (3/2)*n and B.membership(str(j)) == True:
+        false_positives += 1
+
+print(false_positives)
+
+>>> 12
+```
+
+### from_existing 
 
 Create a new Bloom Filter with similar parameters so that they can be merged later.
 

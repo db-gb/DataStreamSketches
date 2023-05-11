@@ -80,8 +80,8 @@ class F2Estimate():
             Two sketches are mergeable iff they share array size and hash
             seeds. Therefore, to create mergeable sketches, use an original to
             create new instances. """
-        new_f2_sketch = F2Estimate(epsilon = original.epsilon, delta = original.delta, \
+        new_sketch = F2Estimate(epsilon = original.epsilon, delta = original.delta, \
                                hash_type= original.hash_type, seed = original.seed)
-        return new_f2_sketch
+        return new_sketch
 
 

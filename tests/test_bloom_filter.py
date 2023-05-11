@@ -127,6 +127,41 @@ def test_bloom_filter_5():
         if B.membership(str(i)) == True:
             false_positive += 1
     assert(false_positive <= 1.1*delta*(1/2)*n)
+
+def test_bloom_filter_6():
+    # insert 0,...,n-1 to B
+    # insert n/2-1,...,3n/2-1 to C
+    # D = C + B
+    # delete n,...,3n/2-1 from B
+    delta = 0.1
+    n = 1000
+    B = BloomFilter(n = 2*n, delta = delta)
+    C = BloomFilter.from_existing(B)
+    result = True
+    false_positive = 0
+
+    for i in range(n):
+        B.insert(str(i))
+
+    for i in range(int(n/2), int((3/2)*n)):
+        C.insert(str(i))
+
+    D = B + C
+    B = B + C
+
+    for i in range(n, int((3/2)*n)):
+        D.delete(str(i))
+        B.delete(str(i))
+
+    for i in range(n):
+        if D.membership(str(i)) == False or B.membership(str(i)) == False :
+            result = False
+    assert(result == True)
+
+    for i in range(n, int((3/2)*n)):
+        if D.membership(str(i)) == True or B.membership(str(i)) == True:
+            false_positive += 1
+    assert(false_positive <= 1.1*delta*(1/2)*n)
     
 if __name__ == '__main__':
     test_bloom_filter_1()
@@ -134,3 +169,4 @@ if __name__ == '__main__':
     test_bloom_filter_3()
     test_bloom_filter_4()
     test_bloom_filter_5()
+    test_bloom_filter_6()
