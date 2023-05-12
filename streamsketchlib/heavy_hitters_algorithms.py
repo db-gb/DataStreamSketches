@@ -2,6 +2,7 @@ from streamsketchlib.count_min import CountMin
 from heapq import heappush, heappop, heapify
 from math import ceil
 from abc import abstractmethod
+from copy import deepcopy
 
 
 class AbstractHeavyHittersAlgorithm:
@@ -20,6 +21,11 @@ class AbstractHeavyHittersAlgorithm:
     @abstractmethod
     def from_existing(self, original):
         pass
+
+    def __add__(self, other):
+        merged_sketch = deepcopy(self)
+        merged_sketch.merge(other)
+        return merged_sketch
 
 
 class CountMinCashRegister(AbstractHeavyHittersAlgorithm):
@@ -136,17 +142,18 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
             if there are available buckets, store the token in a new bucket.
             Otherwise, decrement the count of all other buckets.
             Input: token - could be string or number """
-        self.m += 1
-        if token in self.counters:
-            self.counters[token] += 1
-        else:
-            if len(self.counters) < self.k-1:
-                self.counters[token] = 1
+        for _ in range(count):
+            self.m += 1
+            if token in self.counters:
+                self.counters[token] += 1
             else:
-                for y in list(self.counters):
-                    self.counters[y] -= 1
-                    if self.counters[y] == 0:
-                        del self.counters[y]
+                if len(self.counters) < self.k-1:
+                    self.counters[token] = 1
+                else:
+                    for y in list(self.counters):
+                        self.counters[y] -= 1
+                        if self.counters[y] == 0:
+                            del self.counters[y]
 
     def top_counters(self, amount):
         """ Return the buckets of top estimate counts
@@ -164,12 +171,12 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
             hitters will be returned. Those occurring less than (1-eps)*phi*m
             times will be ignored. Those within the margin may or may not be
             returned """
-        heavy_hitters = {}
+        heavy_hitters = []
         counters = self.counters.copy()
         threshold = (1 - self.epsilon) * self.phi * self.m
         for key, counter in counters.items():
             if counter > threshold:
-                heavy_hitters[key] = self.counters[key]
+                heavy_hitters.append(key)
         return heavy_hitters
 
     def merge(self, other_sketch):
@@ -197,4 +204,17 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
 
     def from_existing(self, original):
         pass
+
+    #def get_memory_footprint(self):
+    #    size = 0
+    #    size += getsizeof(self)
+    #    size += getsizeof(self.k)
+    #    size += getsizeof(self.m)
+    #    size += getsizeof(self.epsilon)
+    #    size += getsizeof(self.phi)
+    #    size += getsizeof(self.counters)
+    #    for key, value in self.counters.items():
+    #        size += getsizeof(key)
+    #        size += getsizeof(value)
+    #    return size
 

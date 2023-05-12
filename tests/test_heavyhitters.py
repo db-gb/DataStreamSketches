@@ -146,3 +146,66 @@ def test_small_merge():
     assert 'test.' in merge_test
     assert 'is' in merge_test
     assert 'only' not in merge_test
+
+def test_hh_mg_small():
+    test_hh = HeavyHittersFinder(phi=0.01, epsilon=0.2,
+                                 algorithm=HeavyHittersFinder.MISRAGRIES)
+    # test = asizeof(test_hh_cm)
+
+    test_hh.insert("This", 1)
+    test_hh.insert("is", 1)
+    test_hh.insert("is", 3)
+    test_hh.insert("only", 1)
+    test_hh.insert("a", 1)
+    test_hh.insert("a", 2)
+    test_hh.insert("test.", 10000)
+    test_hh.insert("b", 1)
+    test_hh.insert("c", 1)
+    test_hh.insert("d", 1)
+
+    # test = asizeof(test_hh_cm)
+
+    test = test_hh.get_heavy_hitters()
+    assert test == ['test.']
+
+
+def test_bidict_kindle_mg():
+    test_hh_cm = HeavyHittersFinder(phi=0.01, epsilon=0.2,
+                                    algorithm=HeavyHittersFinder.MISRAGRIES)
+    test_hh_dict = dict()
+
+    #test_cm_size_start = asizeof(test_hh_cm)
+    #test_dict_size_start = asizeof(test_hh_dict)
+
+    try:
+        test_data = pd.read_csv('kindle_reviews.csv')
+
+    except FileNotFoundError as e:
+        print('Test files not found. Skipping test.')
+        return
+
+    test_data = test_data['reviewerName']
+    reviewers = test_data.tolist()
+
+    start_dict = time()
+    for reviewer in reviewers:
+        if reviewer in test_hh_dict:
+            test_hh_dict[reviewer] += 1
+        else:
+            test_hh_dict[reviewer] = 1
+    end_dict = time()
+
+    dict_time = end_dict - start_dict
+    #test_dict_size_end = asizeof(test_hh_dict)
+
+    start_cm = time()
+    for reviewer in reviewers:
+        test_hh_cm.insert(str(reviewer), 1)
+    end_cm = time()
+    cm_time = end_cm - start_cm
+
+    #test_cm_size_end = asizeof(test_hh_cm)
+
+    test_hh = test_hh_cm.get_heavy_hitters()
+    assert 'Amazon Customer' in test_hh
+    assert 'Kindle Customer' in test_hh
