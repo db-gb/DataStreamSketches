@@ -18,7 +18,7 @@ To create a reservoir sampler, specify the desired sample size during initializa
 sampler = RsvSampling(rsv_size = 1000)
 ```
 
-### Insert
+### insert
 
 Insert a token into the data stream.
 
@@ -29,7 +29,7 @@ for i in range(n):
     sampler.insert(i)
 ```
 
-### Reservoir
+### reservoir
 
 Return the tokens sampled uniformly at random from the data stream observed so far.
 
@@ -51,4 +51,36 @@ for i in sampler.reservoir():
 942
 268
 382
+```
+
+### merge
+
+Merge two samplers with the same reservoir size say k. 
+The merged sampler will k elements sampled uniformly at random from the combined stream.
+
+```python
+n = 1000
+sampler = RsvSampling(rsv_size = 10)
+sampler2 = RsvSampling(rsv_size = 10)
+for i in range(n):
+    sampler.insert(i)
+for i in range(2*n):
+    sampler2.insert(i)
+sampler.merge(sampler2)
+```
+
+### + operator
+
+A + B returns the combined sampler of two sampler with the same reservoir size.
+In other words, A = A+B is the same as A.merge(B). 
+
+```python
+n = 1000
+sampler = RsvSampling(rsv_size = 10)
+sampler2 = RsvSampling(rsv_size = 10)
+for i in range(n):
+    sampler.insert(i)
+for i in range(2*n):
+    sampler2.insert(i)
+sampler = sampler + sampler2
 ```

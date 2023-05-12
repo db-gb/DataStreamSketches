@@ -29,8 +29,7 @@ class AbstractDistinctCountAlgorithm:
 
 
 class BJKST_1(AbstractDistinctCountAlgorithm):
-    """
-    Loglog algorithm: memory efficient data structure to estimate
+    """ Loglog algorithm: memory efficient data structure to estimate
     the number of distinct elements in streams
     """
     def __init__(self, epsilon=0.01, delta=0.01, hash_type="mmh3", seed=42):
@@ -64,12 +63,14 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
             return -1
 
     def _hash(self, token, seed):
-        """ Compute the hash of a token. """
+        """ Compute the hash of a token. 
+        """
         if self.hash_type == "mmh3":
             return mmh3.hash128(token, seed, signed=False)/self.max_128_int
 
     def insert(self, token):
-        """ Insert a token into the sketch. Token must be byte-like objects. """
+        """ Insert a token into the sketch. Token must be byte-like objects. 
+        """
         if len(self.naive_lst) < self.width:
             self.naive_lst.add(token)
 
@@ -84,7 +85,8 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
                     self.table[i].pop()
 
     def merge(self, S):
-        """ Merge self and another sketch S that must have same seeds """
+        """ Merge self and another sketch S that must have same seeds 
+        """
         # merge the small lists
         for x in S.naive_lst:
             if len(self.naive_lst) < self.width:
@@ -105,30 +107,14 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
     def __add__(self, S):
         """ Return the merged sketch of self and S
         """
-        merged_sketch = BJKST_1.from_existing(self)
-        merged_sketch.table = deepcopy(self.table)
-        merged_sketch.naive_lst = deepcopy(self.naive_lst)
-        # merge the small lists
-        for x in S.naive_lst:
-            if len(merged_sketch.naive_lst) < merged_sketch.width:
-                merged_sketch.naive_lst.add(x)
-            else:
-                break
-        # merge the smallest hash values
-        for i in range(merged_sketch.depth):
-            for x in S.table[i]:
-                j = merged_sketch._binary_search(merged_sketch.table[i], x)
-                if j  == -1:
-                    if len(merged_sketch.table[i]) < merged_sketch.width:
-                        bisect.insort(merged_sketch.table[i], x)
-                    elif merged_sketch.table[i][merged_sketch.width-1] > x:
-                        bisect.insort(merged_sketch.table[i], x)
-                        merged_sketch.table[i].pop()
+        merged_sketch = deepcopy(self)
+        merged_sketch.merge(S)
         return merged_sketch
 
     def estimator(self):
         """ Return the estimate for the number of distinct
-        elements inserted so far """
+        elements inserted so far 
+        """
         if len(self.naive_lst) < self.width:
             result = len(self.naive_lst)
             return result
@@ -141,7 +127,8 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
         """ Creates a new sketch based on the parameters of an existing sketch.
             Two sketches are mergeable iff they share array size and hash
             seeds. Therefore, to create mergeable sketches, use an original to
-            create new instances. """
+            create new instances. 
+        """
         new_sketch = cls(epsilon=original.epsilon, delta=original.delta, hash_type=original.hash_type, seed = original.seed)
         return new_sketch
 
