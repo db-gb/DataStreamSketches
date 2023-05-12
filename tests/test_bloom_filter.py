@@ -3,24 +3,21 @@ from streamsketchlib.bloom_filter import BloomFilter
 
 def test_bloom_filter_1():
     test_n = 1000000
-
     test_bf = BloomFilter(n=test_n)
+    result = True
+    false_positives = []
 
     for i in range(test_n):
         test_bf.insert(str(i))
 
-    result = True
     for i in range(test_n):
         if not test_bf.membership(str(i)):
             result = False
     assert result
 
-    false_positives = []
-
     for i in range(test_n, 2*test_n):
         if test_bf.membership(str(i)):
             false_positives.append(i)
-
     false_pos_count = len(false_positives)
     assert false_pos_count < (test_n * 0.012)
 
@@ -29,16 +26,17 @@ def test_bloom_filter_2():
     delta = 0.0001
     n = 100
     B = BloomFilter(n = n, delta = delta)
+    result = True
+    false_positive = 0
+    
     for i in range(n):
         B.insert(str(i))
     
-    result = True
     for i in range(n):
         if B.membership(str(i)) == False:
             result = False
     assert(result == True)
 
-    false_positive = 0
     for i in range(n):
         if B.membership(str(i+n)) == True:
             false_positive += 1
@@ -73,22 +71,20 @@ def test_bloom_filter_4():
     n = 1000
     B = BloomFilter(n = 2*n, delta = delta)
     C = BloomFilter(n = 2*n, delta = delta)
+    result = True
+    false_positive = 0
 
     for i in range(n):
         B.insert(str(i))
-
     for i in range(int(n/2), int((3/2)*n)):
         C.insert(str(i))
-
     B.merge(C)
     
-    result = True
     for i in range(int((3/2)*n)):
         if B.membership(str(i)) == False:
             result = False
     assert(result == True)
-
-    false_positive = 0
+   
     for i in range(2*n, 3*n):
         if B.membership(str(i)) == True:
             false_positive += 1
@@ -109,7 +105,6 @@ def test_bloom_filter_5():
 
     for i in range(n):
         B.insert(str(i))
-
     for i in range(int(n/2), int((3/2)*n)):
         C.insert(str(i))
 
@@ -142,10 +137,8 @@ def test_bloom_filter_6():
 
     for i in range(n):
         B.insert(str(i))
-
     for i in range(int(n/2), int((3/2)*n)):
         C.insert(str(i))
-
     D = B + C
     B = B + C
 

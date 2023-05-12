@@ -1,6 +1,6 @@
 from streamsketchlib.f2_estimate import F2Estimate
 
-def test_f2_estimate():
+def test_f2_estimate_1():
     epsilon = 0.1
     delta = 0.01
 
@@ -17,7 +17,7 @@ def test_f2_estimate():
 
     assert S.estimator() >= (1-epsilon)*4505 and S.estimator() <= (1+epsilon)*4505
 
-def test_f2_estimate_merge():
+def test_f2_estimate_2():
     epsilon = 0.1
     delta = 0.01
 
@@ -40,7 +40,7 @@ def test_f2_estimate_merge():
     S1.merge(S2)
     assert S1.estimator() >= (1-epsilon)*9670 and S1.estimator() <= (1+epsilon)*9670
 
-def test_f2_estimate_add_operation():
+def test_f2_estimate_3():
     epsilon = 0.1
     delta = 0.01
 
@@ -64,11 +64,10 @@ def test_f2_estimate_add_operation():
     assert S1.estimator() >= (1-epsilon)*9670 and S1.estimator() <= (1+epsilon)*9670
 
 
-def test_f2_estimate_combined():
+def test_f2_estimate_4():
     epsilon = 0.1
     delta = 0.01
     n = 10000
-
     S1 = F2Estimate(epsilon = epsilon, delta = delta)
     S2 = F2Estimate.from_existing(S1)
     f = {}
@@ -95,8 +94,8 @@ def test_f2_estimate_combined():
 
 
 if __name__ == '__main__':
-    test_f2_estimate()
-    test_f2_estimate_merge()
-    test_f2_estimate_add_operation()
-    test_f2_estimate_combined()
+    test_f2_estimate_1()
+    test_f2_estimate_2()
+    test_f2_estimate_3()
+    test_f2_estimate_4()
 
