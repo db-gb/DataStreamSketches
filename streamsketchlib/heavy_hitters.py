@@ -1,5 +1,5 @@
-from streamsketchlib.heavy_hitters_algorithms import AbstractHeavyHittersAlgorithm
-from streamsketchlib.heavy_hitters_algorithms import CountMinCashRegister
+from streamsketchlib.heavy_hitters_algorithms \
+    import AbstractHeavyHittersAlgorithm, CountMinCashRegister, MisraGries
 
 
 class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
@@ -20,7 +20,8 @@ class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
                                                                 self.delta,
                                                                 self.seed)
         elif algorithm == HeavyHittersFinder.MISRAGRIES:
-            pass
+            self._heavy_hitters_finder = MisraGries(self.phi, self.epsilon,
+                                                    self.delta, self.seed)
 
     def insert(self, token, count=1):
         self._heavy_hitters_finder.insert(token, count)
