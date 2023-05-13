@@ -28,11 +28,6 @@ class DistinctCount(AbstractDistinctCountAlgorithm):
     def merge(self, another_sketch):
         self._f0_sketch.merge(another_sketch._f0_sketch)
 
-    def __add__(self, S):
-        merged_sketch = DistinctCount.from_existing(self)
-        merged_sketch._f0_sketch = self._f0_sketch + S._f0_sketch
-        return merged_sketch
-    
     @classmethod
     def from_existing(cls, original):
         new_distinct_counter = cls(epsilon=original.epsilon, delta=original.delta, \

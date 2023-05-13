@@ -23,9 +23,10 @@ class AbstractDistinctCountAlgorithm:
     def from_existing(cls, original):
         pass
 
-    @abstractmethod
     def __add__(self, S):
-        pass
+        merged_sketch = deepcopy(self)
+        merged_sketch.merge(S)
+        return merged_sketch
 
 
 class BJKST_1(AbstractDistinctCountAlgorithm):
@@ -103,13 +104,6 @@ class BJKST_1(AbstractDistinctCountAlgorithm):
                     elif self.table[i][self.width-1] > x:
                         bisect.insort(self.table[i], x)
                         self.table[i].pop()
-
-    def __add__(self, S):
-        """ Return the merged sketch of self and S
-        """
-        merged_sketch = deepcopy(self)
-        merged_sketch.merge(S)
-        return merged_sketch
 
     def estimator(self):
         """ Return the estimate for the number of distinct
