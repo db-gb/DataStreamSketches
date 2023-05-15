@@ -59,11 +59,10 @@ class CountMinCashRegister(AbstractHeavyHittersAlgorithm):
                     smallest_estimate = self._min_heap[0][0]
 
     def get_heavy_hitters(self):
-        heavy_hitters = set()
+        heavy_hitters = {}
         for count, item in self._min_heap:
-            if item not in heavy_hitters:
-                heavy_hitters.add(item)
-        return list(heavy_hitters)
+            heavy_hitters[item] = self.count_min.estimate_count(item)
+        return heavy_hitters
 
     @classmethod
     def from_existing(cls, original):
@@ -171,12 +170,12 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
             hitters will be returned. Those occurring less than (1-eps)*phi*m
             times will be ignored. Those within the margin may or may not be
             returned """
-        heavy_hitters = []
+        heavy_hitters = {}
         counters = self.counters.copy()
         threshold = (1 - self.epsilon) * self.phi * self.m
         for key, counter in counters.items():
             if counter > threshold:
-                heavy_hitters.append(key)
+                heavy_hitters[key] = counter
         return heavy_hitters
 
     def merge(self, other_sketch):

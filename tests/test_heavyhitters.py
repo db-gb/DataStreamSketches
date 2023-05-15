@@ -20,7 +20,7 @@ def test_hh_small():
     #test = asizeof(test_hh_cm)
 
     test = test_hh.get_heavy_hitters()
-    assert test == ['test.']
+    assert test == {'test.': 10000}
 
 
 def test_hh_large():
@@ -166,7 +166,7 @@ def test_hh_mg_small():
     # test = asizeof(test_hh_cm)
 
     test = test_hh.get_heavy_hitters()
-    assert test == ['test.']
+    assert test == {'test.': 10000}
 
 
 def test_bidict_kindle_mg():
