@@ -120,7 +120,6 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
         """
         self.phi = phi
         self.epsilon = epsilon
-        self.seed = seed
 
         self.k = ceil(1 / (self.phi * self.epsilon))
         self.counters = {}

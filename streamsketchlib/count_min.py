@@ -43,6 +43,7 @@ class CountMin:
         return int(bin_number)
 
     def insert(self, token, count):
+        # !!! Remember to put a guardrail against negative updates
         for row in range(self.depth):
             col = self._hash(token, self._hash_seeds[row])
             self.table[row][col] = self.table[row][col] + count
