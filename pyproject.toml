@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sketchlib"
-version = "0.0.1"
+version = "0.0.2"
 description = "Library of streaming algorithms for processing massive data."
 readme = "README.md"
 authors = [{ name = "Dr. Hoa Vu and Daniel Barnas", email = "danielbarn90@gmail.com" }]
@@ -30,7 +30,7 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 Homepage = "https://datasketchlib.github.io/"
 
 [tool.bumpver]
-current_version = "0.0.1"
+current_version = "0.0.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
