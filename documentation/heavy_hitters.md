@@ -50,8 +50,7 @@ stream.insert("apple", 5)
 
 
 ### get_heavy_hitters
-Returns a dictionary of all the heavy-hitters that have appeared in the stream so far along with an estimated count for each. 
-(NOTE: the estimated count is a very poor estimate and is useful mostly for comparing heavy-hitters relative to one another).  
+Returns a dictionary of all the heavy-hitters that have appeared in the stream so far along with an estimated count for each.
   
 For example,  
 ```python
