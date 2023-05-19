@@ -27,7 +27,7 @@ requires-python = ">=3.9"
 dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 
 [project.urls]
-Homepage = "https://github.com/db-gb/DataStreamSketches"
+Homepage = "https://datasketchlib.github.io/"
 
 [tool.bumpver]
 current_version = "0.0.1"
