@@ -125,15 +125,6 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
         self.counters = {}
         self.m = 0
 
-    @classmethod
-    def from_phi_and_eps(cls, phi=0.0025, epsilon=0.2):
-        """ Initializes Misra-Gries instance directly from phi and epsilon."""
-        new_misra = cls()
-        new_misra.phi = phi
-        new_misra.epsilon = epsilon
-        new_misra.k = ceil(1 / (phi * epsilon))
-        return new_misra
-
     def insert(self, token, count=1):
         """ Processes a new token into the dictionary. If an element already
             occupies a bucket, then increment that bucket count. If not, then
@@ -200,19 +191,18 @@ class MisraGries(AbstractHeavyHittersAlgorithm):
         for key in keys_to_delete:
             del self.counters[key]
 
-    def from_existing(self, original):
-        pass
+    @classmethod
+    def from_existing(cls, original):
+        """ Creates a new sketch based on the parameters of an existing sketch.
+            Two sketches are mergeable iff they share array size and hash
+            seeds. Therefore, to create mergeable sketches, use an original to
+            create new instances. """
+        new_mg_hh = cls()
+        new_mg_hh.epsilon = original.epsilon
+        new_mg_hh.phi = original.phi
+        new_mg_hh.k = original.k
 
-    #def get_memory_footprint(self):
-    #    size = 0
-    #    size += getsizeof(self)
-    #    size += getsizeof(self.k)
-    #    size += getsizeof(self.m)
-    #    size += getsizeof(self.epsilon)
-    #    size += getsizeof(self.phi)
-    #    size += getsizeof(self.counters)
-    #    for key, value in self.counters.items():
-    #        size += getsizeof(key)
-    #        size += getsizeof(value)
-    #    return size
+        new_mg_hh.counters = {}
+        new_mg_hh.m = 0
+        return new_mg_hh
 

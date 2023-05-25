@@ -209,3 +209,45 @@ def test_bidict_kindle_mg():
     test_hh = test_hh_cm.get_heavy_hitters()
     assert 'Amazon Customer' in test_hh
     assert 'Kindle Customer' in test_hh
+
+
+def test_small_misra_merge():
+    test_hh_mg = HeavyHittersFinder(phi=0.01, epsilon=0.2,
+                                    algorithm=HeavyHittersFinder.MISRAGRIES)
+    test_hh_mg_2 = HeavyHittersFinder.from_existing(test_hh_mg)
+
+    test_hh_mg.insert("This", 1)
+    test_hh_mg.insert("is", 1)
+    test_hh_mg.insert("is", 3)
+    test_hh_mg.insert("only", 1)
+    test_hh_mg.insert("a", 1)
+    test_hh_mg.insert("a", 2)
+    test_hh_mg.insert("test.", 10000)
+    test_hh_mg.insert("b", 1)
+    test_hh_mg.insert("c", 1)
+    test_hh_mg.insert("d", 1)
+
+    test_hh_mg_2.insert("This", 1)
+    test_hh_mg_2.insert("is", 400)
+    test_hh_mg_2.insert("is", 3)
+    test_hh_mg_2.insert("only", 90)
+    test_hh_mg_2.insert("a", 1)
+    test_hh_mg_2.insert("a", 2)
+    test_hh_mg_2.insert("test.", 1)
+    test_hh_mg_2.insert("b", 1)
+    test_hh_mg_2.insert("c", 1)
+    test_hh_mg_2.insert("d", 1)
+
+    test1 = test_hh_mg.get_heavy_hitters()
+    test2 = test_hh_mg_2.get_heavy_hitters()
+
+    assert 'test.' in test1
+    assert 'is' in test2
+    assert 'only' in test2
+
+    test_hh_mg.merge(test_hh_mg_2)
+    merge_test = test_hh_mg.get_heavy_hitters()
+
+    assert 'test.' in merge_test
+    assert 'is' in merge_test
+    assert 'This' not in merge_test
