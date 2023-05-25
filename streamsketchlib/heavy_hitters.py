@@ -8,20 +8,20 @@ class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
 
     def __init__(self, phi=0.05, epsilon=0.2, delta=0.01, seed=42,
                  algorithm=COUNTMIN):
-        self.phi = phi
-        self.epsilon = epsilon
-        self.delta = delta
-        self.seed = seed
+        self._phi = phi
+        self._epsilon = epsilon
+        self._delta = delta
+        self._seed = seed
         self._heavy_hitters_finder = None
 
         if algorithm == HeavyHittersFinder.COUNTMIN:
-            self._heavy_hitters_finder = CountMinCashRegister(self.phi,
-                                                                self.epsilon,
-                                                                self.delta,
-                                                                self.seed)
+            self._heavy_hitters_finder = CountMinCashRegister(self._phi,
+                                                                self._epsilon,
+                                                                self._delta,
+                                                                self._seed)
         elif algorithm == HeavyHittersFinder.MISRAGRIES:
-            self._heavy_hitters_finder = MisraGries(self.phi, self.epsilon,
-                                                    self.delta, self.seed)
+            self._heavy_hitters_finder = MisraGries(self._phi, self._epsilon,
+                                                    self._delta, self._seed)
 
     def insert(self, token, count=1):
         self._heavy_hitters_finder.insert(token, count)
@@ -38,10 +38,8 @@ class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
             Two sketches are mergeable iff they share array size and hash
             seeds. Therefore, to create mergeable sketches, use an original to
             create new instances. """
-        new_hh = cls()
-        new_hh.epsilon = original.epsilon
-        new_hh.delta = original.delta
-        new_hh.phi = original.phi
+        new_hh = cls(epsilon=original._epsilon, delta=original._delta,
+                     phi=original._phi)
 
         algorithm_class = original._heavy_hitters_finder.__class__
         new_hh._heavy_hitters_finder = algorithm_class\
