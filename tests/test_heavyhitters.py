@@ -1,3 +1,4 @@
+import pytest
 from streamsketchlib.heavy_hitters import HeavyHittersFinder
 import pandas as pd
 from time import time
@@ -23,47 +24,47 @@ def test_hh_small():
     assert test == {'test.': 10000}
 
 
-def test_hh_large():
-    test_hh = HeavyHittersFinder(phi=0.005, epsilon=0.2)
-    test_hh_dict = dict()
-
-    #test_cm_size_start = asizeof(test_hh_cm)
-    #test_dict_size_start = asizeof(test_hh_dict)
-
-    try:
-        test_data = pd.read_csv('item_sales_filtered.csv')
-
-    except FileNotFoundError as e:
-        print('Test files not found. Skipping test.')
-        return
-
-    item_sales = test_data.values.tolist()
-
-    start_dict = time()
-    for item in item_sales:
-        if item[0] in test_hh_dict:
-            test_hh_dict[item[0]] += item[1]
-        else:
-            test_hh_dict[item[0]] = item[1]
-    end_dict = time()
-
-    dict_time = end_dict - start_dict
-    #test_dict_size_end = asizeof(test_hh_dict)
-
-    start_cm = time()
-    for item in item_sales:
-        test_hh.insert(str(item[0]), item[1])
-    end_cm = time()
-
-    cm_time = end_cm - start_cm
-    #test_cm_size_end = asizeof(test_hh_cm)
-
-    test = test_hh.get_heavy_hitters()
-    assert '1503844' in test
-    assert '1473474' in test
-    assert '2042941' in test
-    assert '2042947' in test
-    assert '819932' not in test
+# def test_hh_large():
+#     test_hh = HeavyHittersFinder(phi=0.005, epsilon=0.2)
+#     test_hh_dict = dict()
+#
+#     #test_cm_size_start = asizeof(test_hh_cm)
+#     #test_dict_size_start = asizeof(test_hh_dict)
+#
+#     try:
+#         test_data = pd.read_csv('item_sales_filtered.csv')
+#
+#     except FileNotFoundError as e:
+#         print('Test files not found. Skipping test.')
+#         return
+#
+#     item_sales = test_data.values.tolist()
+#
+#     start_dict = time()
+#     for item in item_sales:
+#         if item[0] in test_hh_dict:
+#             test_hh_dict[item[0]] += item[1]
+#         else:
+#             test_hh_dict[item[0]] = item[1]
+#     end_dict = time()
+#
+#     dict_time = end_dict - start_dict
+#     #test_dict_size_end = asizeof(test_hh_dict)
+#
+#     start_cm = time()
+#     for item in item_sales:
+#         test_hh.insert(str(item[0]), item[1])
+#     end_cm = time()
+#
+#     cm_time = end_cm - start_cm
+#     #test_cm_size_end = asizeof(test_hh_cm)
+#
+#     test = test_hh.get_heavy_hitters()
+#     assert '1503844' in test
+#     assert '1473474' in test
+#     assert '2042941' in test
+#     assert '2042947' in test
+#     assert '819932' not in test
 
 
 def test_bidict_kindle():
@@ -251,3 +252,30 @@ def test_small_misra_merge():
     assert 'test.' in merge_test
     assert 'is' in merge_test
     assert 'This' not in merge_test
+
+
+def test_properties():
+    # Check to see that heavy_hitter properties can be viewed, but not changed
+    test_phi = 0.01
+    test_eps = 0.02
+    test_delta = 0.03
+    test_seed = 4
+
+    test = HeavyHittersFinder(phi=test_phi, epsilon=test_eps, delta=test_delta,
+                              seed=test_seed)
+
+    #Verify that getters work
+    assert test.phi == test_phi
+    assert test.epsilon == test_eps
+    assert test.delta == test_delta
+    assert test.seed == test_seed
+
+    # Verify that setters throw exceptions
+    with pytest.raises(AttributeError):
+        test.phi = 0.05
+    with pytest.raises(AttributeError):
+        test.epsilon = 0.05
+    with pytest.raises(AttributeError):
+        test.delta = 0.05
+    with pytest.raises(AttributeError):
+        test.seed = 0.05

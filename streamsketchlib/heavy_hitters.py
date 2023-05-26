@@ -38,11 +38,36 @@ class HeavyHittersFinder(AbstractHeavyHittersAlgorithm):
             Two sketches are mergeable iff they share array size and hash
             seeds. Therefore, to create mergeable sketches, use an original to
             create new instances. """
-        new_hh = cls(epsilon=original._epsilon, delta=original._delta,
-                     phi=original._phi)
+        new_hh = cls(epsilon=original.epsilon, delta=original.delta,
+                     phi=original.phi, seed=original.seed)
 
         algorithm_class = original._heavy_hitters_finder.__class__
         new_hh._heavy_hitters_finder = algorithm_class\
             .from_existing(original._heavy_hitters_finder)
 
         return new_hh
+
+    @property
+    def phi(self):
+        """Defines the cutoff for what constitutes a heavy hitter. The default
+        value is 0.05."""
+        return self._phi
+
+    @property
+    def epsilon(self):
+        """Controls margin of error within which false positives are permitted.
+         The default value is 0.02."""
+        return self._epsilon
+
+    @property
+    def delta(self):
+        """Controls the failure probability. The default value is 0.01
+        (used in non-deterministic algorithms only)."""
+        return self._delta
+
+    @property
+    def seed(self):
+        """The seed for randomness. The default value is 42 (used in
+        non-deterministic algorithms only)."""
+        return self._seed
+
