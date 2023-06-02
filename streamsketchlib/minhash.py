@@ -100,7 +100,7 @@ class MinHash:
     def epsilon(self):
         """ Controls the estimate's quality. Resulting Jaccard Similarity
         estimate should be within epsilon of true value. The default value is
-        0.02."""
+        0.01."""
         return self._epsilon
 
     @property
