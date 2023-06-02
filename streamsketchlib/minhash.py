@@ -1,97 +1,107 @@
 import mmh3
 import math
 import random
-from collections import defaultdict
+from copy import deepcopy
 
 
 class MinHash:
-    def __init__(self, epsilon=0.2, delta=0.05, c=2, hash_type="mmh3", r=3, b=62):
+    MAX_32_INT = pow(2, 32) - 1
+
+    def __init__(self, epsilon=0.2, hash_type="mmh3"):
         """ epsilon: relative error, delta: failure probability
         for each hash function h, maintain the smallest hash value H """
+        self._epsilon = epsilon
+        self._hash_type = hash_type
 
-        self.seed = []
-        self.sets = dict()
-
-        self.k = int(c * math.ceil(1/(epsilon * epsilon)) *
-                     math.log(c/delta, math.e))
-        self.k = 186
-        self.hash_type = hash_type
-
-        self.seed_range = int(math.pow(self.k, 2))
-        self.max_128_int = pow(2, 128)-1
-        self.max_32_int = pow(2, 32)-1
+        # Number of hash functions
+        self._signature_length = math.ceil(1/pow(self._epsilon, 2))
 
         # initialize the seeds for hash functions
-        self.seed = [random.randint(1, self.seed_range) for _ in range(self.k)]
+        self._seed_range = int(math.pow(self._signature_length, 2))
+        self._seeds = [random.randint(1, self._seed_range) for _
+                       in range(self._signature_length)]
 
-        self.b = b
-        self.r = r
-        self.lsh_seed = [random.randint(1, self.seed_range) for _ in range(self.b)]
-        self.bands = dict()
-        self.neighborhoods = defaultdict(set)
+        # Initialize the signature
+        self._minhash_signature = [1] * self._signature_length
 
-    def _hash128(self, token, seed):
-        """ Compute the hash of a token. """
-        if self.hash_type == "mmh3":
-            return mmh3.hash128(token, seed, signed=False)/self.max_128_int
+    def insert(self, token):
+        for i in range(self._signature_length):
+            current_hash = self._hash(token, self._seeds[i])
+            if current_hash < self._minhash_signature[i]:
+                self._minhash_signature[i] = current_hash
+
+    def merge(self, other_minhash):
+        if other_minhash.signature_size != self._signature_length:
+            raise AttributeError("Minhash signature sets must be of equal "
+                                 "lengths k in order to merge.")
+        else:
+            for i in range(self._signature_length):
+                if self._seeds[i] != other_minhash.seeds[i]:
+                    raise AttributeError("Minhash hash functions must have "
+                                         "same seed values for valid result.")
+                else:
+                    if other_minhash.set_signature[i] < \
+                            self._minhash_signature[i]:
+                        self._minhash_signature[i] = \
+                            other_minhash.minhash_signature[i]
+
+    def __add__(self, other_minhash):
+        merged_sketch = deepcopy(self)
+        merged_sketch.merge(other_minhash)
+        return merged_sketch
 
     def _hash(self, token, seed):
         """ Compute the hash of a token. """
-        if self.hash_type == "mmh3":
-            return mmh3.hash(token, seed, signed=False)/self.max_32_int
+        if self._hash_type == "mmh3":
+            return mmh3.hash(token, seed, signed=False)/MinHash.MAX_32_INT
 
-    def insert(self, set_name, token):
-        """ Insert a token into the sketch. Token must be byte-like objects."""
-        if set_name not in self.sets:
-            self.sets[set_name] = [1 for _ in range(self.k)]
-        for i in range(self.k):
-            hash_value = self._hash(token, self.seed[i])
-            if hash_value < self.sets[set_name][i]:
-                self.sets[set_name][i] = hash_value
+    @classmethod
+    def from_existing(cls, original):
+        """ Creates a new minhash based on the parameters of an existing minhash.
+            Two minhashes are mergeable iff they share array size and hash
+            seeds. Therefore, to create mergeable minhashes, use an original to
+            create new instances. """
+        new_minhash = cls()
+        new_minhash._epsilon = original.epsilon
+        new_minhash._hash_type = original.hash_type
+        new_minhash._signature_length = original._signature_length
+        new_minhash._seed_range = original.seed_range
+        new_minhash._seeds = original.seeds
+        # Initialize the signature
+        new_minhash._set_signature = [1] * new_minhash._signature_length
 
-    def measure_jaccard_distance(self, set1, set2):
-        match = 0
-        for i in range(self.k):
-            set1_smallest_hash = self.sets[set1][i]
-            set2_smallest_hash = self.sets[set2][i]
-            if set1_smallest_hash == set2_smallest_hash:
-                match += 1
-        jaccard_estimate = match / self.k
-        return jaccard_estimate
+        return new_minhash
 
-    def create_jaccard_grid(self):
-        set_names = list(self.sets.keys())
-        set_count = len(set_names)
+    @property
+    def epsilon(self):
+        """ Controls the estimate's quality. The default value is 0.02."""
+        return self._epsilon
 
-        grid = [[0 for set_name in set_names] for set_name in set_names]
-        max_overlap = {"SetA": "", "SetB": "", "Dist": 0}
+    @property
+    def hash_type(self):
+        """ No documentation yet. """
+        return self._hash_type
 
-        for setA in range(set_count):
-            for setB in range(setA, set_count):
-                dist = self.measure_jaccard_distance(set_names[setA], set_names[setB])
-                if dist > max_overlap["Dist"] and dist < 1:
-                    max_overlap["SetA"] = set_names[setA]
-                    max_overlap["SetB"] = set_names[setB]
-                    max_overlap["Dist"] = dist
-                grid[setA][setB] = dist
-                grid[setB][setA] = grid[setA][setB]
+    @property
+    def signature_length(self):
+        """ No documentation yet. """
+        return self._signature_length
 
-        return grid, max_overlap
+    @property
+    def seed_range(self):
+        """ Controls the estimate's quality. The default value is 0.02."""
+        return self._seed_range
 
-    def divide_list_into_chunks(self, key, r, b):
-        hashed_chunk_list = []
-        signature = self.sets[key]
-        for i in range(0, b):
-            x = i * r
-            chunk = signature[x: x+r]
-            chunk = str(chunk)
-            chunk_hash = self._hash(chunk, self.lsh_seed[i])
-            self.neighborhoods[chunk_hash].add(key)
-            hashed_chunk_list.append(chunk_hash)
-        return hashed_chunk_list
+    @property
+    def seeds(self):
+        """ Controls the estimate's quality. The default value is 0.02."""
+        return self._seeds
 
-    def create_bands_for_lsh(self, r, b):
-        self.neighborhoods = defaultdict(set)
-        for key in self.sets.keys():
-            split_signature = self.divide_list_into_chunks(key, r, b)
-            self.bands[key] = split_signature
+    @property
+    def set_signature(self):
+        """ Controls the estimate's quality. The default value is 0.02."""
+        return self._set_signature
+
+
+
+
