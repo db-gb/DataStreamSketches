@@ -14,7 +14,7 @@ class MinHash:
         self._hash_type = hash_type
 
         # Number of hash functions. Length of resulting signature.
-        self._k = math.ceil(1/pow(self._epsilon, 2))
+        self._k = 4*math.ceil(1/pow(self._epsilon, 2))
 
         # initialize the seeds for hash functions
         self._seed_range = int(math.pow(self._k, 2))
