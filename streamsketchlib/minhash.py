@@ -40,7 +40,7 @@ class MinHash:
         try:
             self._check_mergeability(other_mh)
             for i in range(self._k):
-                if other_mh.set_signature[i] < self._minhash_signature[i]:
+                if other_mh.minhash_signature[i] < self._minhash_signature[i]:
                     self._minhash_signature[i] = other_mh.minhash_signature[i]
         except AttributeError:
             print("Merge attempted on incompatible minhash instances.")
