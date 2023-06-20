@@ -7,19 +7,18 @@ from copy import deepcopy
 class MinHash:
     MAX_32_INT = pow(2, 32) - 1
 
-    def __init__(self, epsilon=0.1, hash_type="mmh3"):
+    def __init__(self, epsilon=0.1, hash_type="mmh3", seed=42):
         """ epsilon: relative error, delta: failure probability
         for each hash function h, maintain the smallest hash value H """
         self._epsilon = epsilon
         self._hash_type = hash_type
+        self._seed = seed
 
         # Number of hash functions. Length of resulting signature.
         self._k = 4*math.ceil(1/pow(self._epsilon, 2))
 
         # initialize the seeds for hash functions
-        self._seed_range = int(math.pow(self._k, 2))
-        self._seeds = [random.randint(1, self._seed_range) for _
-                       in range(self._k)]
+        self._seeds = [self._seed * (i+1) for i in range(self._k)]
 
         # Initialize the signature
         self._minhash_signature = [1] * self._k
@@ -66,7 +65,7 @@ class MinHash:
         new_minhash._epsilon = original.epsilon
         new_minhash._hash_type = original.hash_type
         new_minhash._k = original.k
-        new_minhash._seed_range = original.seed_range
+        new_minhash._seed = original.seed
         new_minhash._seeds = original.seeds
         # Initialize the signature
         new_minhash._set_signature = [1] * new_minhash._k
@@ -116,9 +115,9 @@ class MinHash:
         return self._k
 
     @property
-    def seed_range(self):
-        """ The range over which hash seeds are randomly chosen. """
-        return self._seed_range
+    def seed(self):
+        """ The original seed used for randomization of the hash functions. """
+        return self._seed
 
     @property
     def seeds(self):
